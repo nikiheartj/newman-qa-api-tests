@@ -1,0 +1,800 @@
+{
+  "info": {
+    "_postman_id": "bb3b8f51-29dd-460b-8935-c91d37e65be8",
+    "name": "Platzi Fake Store",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45424328"
+  },
+  "item": [
+    {
+      "name": "Authorization",
+      "item": [
+        {
+          "name": "getToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "})",
+                  "",
+                  "pm.test(\"Status text is 'OK'\", function () {",
+                  "    pm.response.to.have.status('Created')",
+                  "})",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Accees & Refresh token is received\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"access_token\");",
+                  "    pm.expect(jsonData.access_token).to.be.a(\"string\").and.to.not.be.empty;",
+                  "    pm.expect(jsonData).to.have.property(\"refresh_token\");",
+                  "    pm.expect(jsonData.refresh_token).to.be.a(\"string\").and.to.not.be.empty;",
+                  "",
+                  "})",
+                  "",
+                  "const token = jsonData.access_token;",
+                  "pm.collectionVariables.set('token', token)"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@mail.com\",\n  \"password\": \"changeme\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getUserProfile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "pm.test(\"Status text is 'OK'\", function () {",
+                  "    pm.response.to.have.status('OK')",
+                  "})",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"User profile data is returned\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id')",
+                  "    pm.expect(jsonData).to.have.property('email')",
+                  "    pm.expect(jsonData).to.have.property('name')",
+                  "    console.log(jsonData)",
+                  "})",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// pm.sendRequest({",
+                  "//     url: pm.collectionVariables.get('baseUrl') + \"/api/v1/auth/login\",",
+                  "//     method: 'POST',",
+                  "//     header: {",
+                  "//         'Content-Type': 'application/json'",
+                  "//     },",
+                  "//     body: {",
+                  "//         mode: 'raw',",
+                  "//         raw: JSON.stringify({",
+                  "//             \"email\": \"john@mail.com\",",
+                  "//             \"password\": \"changeme\"",
+                  "//         })",
+                  "//     }",
+                  "// }, function (err, response) {",
+                  "//     if (err) {",
+                  "//         console.log(err);",
+                  "//     }",
+                  "//     const json = response.json()",
+                  "//     pm.collectionVariables.set('token', json.access_token)",
+                  "// })",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "profile", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "createUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "})",
+                  "pm.test(\"Status text is 'Created'\", function () {",
+                  "    pm.response.to.have.status('Created')",
+                  "})",
+                  "",
+                  "const requestBody = JSON.parse(pm.request.body.raw);",
+                  "const json = pm.response.json()",
+                  "pm.test(\"All major user fields are returned\", function () {",
+                  "    pm.expect(json).to.have.property('id')",
+                  "    pm.expect(json.email).to.include('nico@gmail.com')",
+                  "    pm.expect(json.password).to.include('1234q')",
+                  "    pm.expect(json.name).to.include('Cool Man')",
+                  "    pm.expect(json.role).to.include('customer')",
+                  "    pm.expect(json.avatar).to.include('https://picsum.photos/800/131/sdasd/ad')",
+                  "})",
+                  "",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get(\"baseUrl\") + `/api/v1/users/${json.id}`,",
+                  "    method: \"GET\",",
+                  "    header: {",
+                  "        'Content-Type': 'application/json'",
+                  "    }",
+                  "}, function (err, response) {",
+                  "    pm.expect(err).to.equal(null);",
+                  "    const getUserJson = response.json();",
+                  "",
+                  "    pm.test(\"Get created user\", function () {",
+                  "        pm.expect(response.code).to.eql(200)",
+                  "        pm.expect(getUserJson.email).to.eql(requestBody.email)",
+                  "        pm.expect(getUserJson.password).to.eql(requestBody.password)",
+                  "        pm.expect(getUserJson.name).to.eql(requestBody.name)",
+                  "        pm.expect(getUserJson.id).to.eql(json.id)",
+                  "    })",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cool Man\",\n  \"email\": \"nico@gmail.com\",\n  \"password\": \"1234q\",\n  \"avatar\": \"https://picsum.photos/800/131/sdasd/ad\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteUser",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get('baseUrl') + \"/api/v1/users/\",",
+                  "    method: 'POST',",
+                  "    header: {",
+                  "        'Content-Type': 'application/json'",
+                  "    },",
+                  "    body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({",
+                  "            \"name\": \"Cool Man\",",
+                  "            \"email\": \"nico@gmail.com\",",
+                  "            \"password\": \"1234q\",",
+                  "            \"avatar\": \"https://picsum.photos/800/131/sdasd/ad\"",
+                  "        })",
+                  "    }",
+                  "}, function (err, response) {",
+                  "    if (err) {",
+                  "        console.log(err);",
+                  "    }",
+                  "    const json = response.json()",
+                  "    pm.test(\"User is created\", function () {",
+                  "        pm.expect(response).to.have.property('code', 201);",
+                  "    })",
+                  "    pm.collectionVariables.set(\"createdUserId\", json.id)",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const userId = pm.collectionVariables.get(\"createdUserId\");",
+                  "",
+                  "pm.sendRequest({",
+                  "    url: pm.collectionVariables.get(\"baseUrl\") + `/api/v1/users/${userId}`,",
+                  "    method: \"GET\",",
+                  "    header: {",
+                  "        'Content-Type': 'application/json'",
+                  "    }",
+                  "}, function (err, response) {",
+                  "    pm.expect(err).to.equal(null);",
+                  "    const getUserJson = response.json();",
+                  "    ",
+                  "    pm.test(\"Get created user\", function () {",
+                  "        pm.expect(response.code).to.eql(400)",
+                  "        pm.expect(getUserJson.message).to.include('Could not find any entity of type \"User\" matching')",
+                  "    })",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.escuelajs.co/api/v1/users/{{createdUserId}}",
+              "protocol": "https",
+              "host": ["api", "escuelajs", "co"],
+              "path": ["api", "v1", "users", "{{createdUserId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Filter Products",
+      "item": [
+        {
+          "name": "filterByTitle",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const title = pm.collectionVariables.get(\"title\");",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "",
+                  "pm.test(\"Status text is 'OK'\", function () {",
+                  "    pm.response.to.have.status('OK')",
+                  "})",
+                  "",
+                  "pm.test(`Get products by selected title - ${title}`, function () {",
+                  "    const response = pm.response.json();",
+                  "    for (const product of response) {",
+                  "        pm.expect(product.title).to.include(title)",
+                  "        // console.log(product.title)",
+                  "    }",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "jwt",
+              "jwt": [
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "header",
+                  "value": "{{token}}",
+                  "type": "string"
+                },
+                {
+                  "key": "algorithm",
+                  "value": "HS256",
+                  "type": "string"
+                },
+                {
+                  "key": "isSecretBase64Encoded",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "payload",
+                  "value": "{}",
+                  "type": "string"
+                },
+                {
+                  "key": "headerPrefix",
+                  "value": "Bearer",
+                  "type": "string"
+                },
+                {
+                  "key": "queryParamKey",
+                  "value": "token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/?title={{title}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", ""],
+              "query": [
+                {
+                  "key": "title",
+                  "value": "{{title}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "filterByPrice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const price = Number(pm.collectionVariables.get(\"price\"));",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "",
+                  "pm.test(\"Status text is 'OK'\", function () {",
+                  "    pm.response.to.have.status('OK')",
+                  "})",
+                  "",
+                  "pm.test(`Get products by selected price - ${price}`, function () {",
+                  "    const response = pm.response.json();",
+                  "    for (const product of response) {",
+                  "        pm.expect(product.price).to.equal(price);",
+                  "        console.log(product.price)",
+                  "    }",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/?price={{price}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", ""],
+              "query": [
+                {
+                  "key": "price",
+                  "value": "{{price}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "filterByPriceRange",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const priceMin = Number(pm.collectionVariables.get(\"priceMin\"));",
+                  "const priceMax = Number(pm.collectionVariables.get(\"priceMax\"));",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "",
+                  "pm.test(\"Status text is 'OK'\", function () {",
+                  "    pm.response.to.have.status('OK')",
+                  "})",
+                  "",
+                  "pm.test(`Receive products by selected price range ${priceMin}-${priceMax}`, function () {",
+                  "    const productList = pm.response.json();",
+                  "    // console.log(productList)",
+                  "    for (const product of productList) {",
+                  "        pm.expect(product.price).to.be.at.least(priceMin);",
+                  "        pm.expect(product.price).to.be.at.most(priceMax);",
+                  "        // console.log(product.price)",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/?price_min={{priceMin}}&price_max={{priceMax}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", ""],
+              "query": [
+                {
+                  "key": "price_min",
+                  "value": "{{priceMin}}"
+                },
+                {
+                  "key": "price_max",
+                  "value": "{{priceMax}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "getProductList",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "})",
+              "pm.test(\"Status text is 'OK'\", function () {",
+              "    pm.response.to.have.status('OK')",
+              "})",
+              "",
+              "pm.test(\"Get an array of the list products\", function () {",
+              "    pm.expect(pm.response.json()).to.be.an('array');",
+              "    const arrayProducts = pm.response.json();",
+              "    pm.expect(arrayProducts.length).to.be.greaterThan(0);",
+              "})",
+              "",
+              "// Store the first product ID in a collection variable for future use.",
+              "const productId = pm.response.json()[0].id;",
+              "pm.collectionVariables.set('productId', productId);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [""],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "products"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getProductListById",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const product = pm.response.json();",
+              "const productId = Number(pm.collectionVariables.get(\"productId\"));",
+              "// console.log(product)",
+              "",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "})",
+              "pm.test(\"Status text is 'OK'\", function () {",
+              "    pm.response.to.have.status('OK')",
+              "})",
+              "pm.test(\"Product is not null\", function () {",
+              "    pm.expect(product).to.not.be.null;",
+              "",
+              "})",
+              "pm.test(\"Product ID matches the productId variable in the URL\", function () {",
+              "    pm.expect(product.id).to.eql(productId);",
+              "})",
+              "pm.test(\"Product contains 'title' property\", function () {",
+              "    pm.expect(product).to.have.property('title');",
+              "})",
+              "pm.test(\"Product contains 'slug' property\", function () {",
+              "    pm.expect(product).to.have.property('slug')",
+              "})",
+              "pm.test(\"Product contains 'description' property\", function () {",
+              "    pm.expect(product).to.have.property('description')",
+              "})",
+              "pm.test(\"Product contains 'category' property\", function () {",
+              "    pm.expect(product).to.have.property('category')",
+              "})",
+              "pm.test(\"Product contains 'images' property\", function () {",
+              "    pm.expect(product).to.have.property('images')",
+              "})",
+              "pm.test(\"Product contains 'price' property\", function () {",
+              "    pm.expect(product).to.have.property('price')",
+              "})"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// pm.sendRequest({",
+              "//     url: 'https://api.escuelajs.co/api/v1/products',",
+              "//     method: 'GET',",
+              "// },",
+              "//     function(err, response) {",
+              "//         if (err){",
+              "//              console.log(err)",
+              "            ",
+              "//         }",
+              "//         const json = response.json()",
+              "//         const productId = json[0].id",
+              "//         pm.collectionVariables.set('productId', productId)",
+              "//         // console.log(productId)",
+              "//     })"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "products", "{{productId}}"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "jwt",
+    "jwt": [
+      {
+        "key": "header",
+        "value": "{{token}}",
+        "type": "string"
+      },
+      {
+        "key": "algorithm",
+        "value": "HS256",
+        "type": "string"
+      },
+      {
+        "key": "isSecretBase64Encoded",
+        "value": false,
+        "type": "boolean"
+      },
+      {
+        "key": "payload",
+        "value": "{}",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      },
+      {
+        "key": "headerPrefix",
+        "value": "Bearer",
+        "type": "string"
+      },
+      {
+        "key": "queryParamKey",
+        "value": "token",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "title",
+      "value": "Generic"
+    },
+    {
+      "key": "price",
+      "value": "10"
+    },
+    {
+      "key": "priceMin",
+      "value": "10"
+    },
+    {
+      "key": "priceMax",
+      "value": "50"
+    },
+    {
+      "key": "token",
+      "secret": true
+    },
+    {
+      "key": "createdUserId",
+      "value": ""
+    },
+    {
+      "key": "baseUrl",
+      "value": "https://api.escuelajs.co"
+    }
+  ]
+}

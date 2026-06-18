@@ -1,0 +1,12 @@
+{
+  "name": "newman-api-tests",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/nikiheartj/newman-qa-api-tests#readme",
+  "license": "ISC",
+  "author": "Niki",
+  "type": "commonjs",
+  "scripts": {
+    "test": "newman run tests/jsonPlaceholder.postman.json -r htmlextra"
+  }
+}

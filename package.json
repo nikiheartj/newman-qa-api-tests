@@ -7,6 +7,6 @@
   "author": "Niki",
   "type": "commonjs",
   "scripts": {
-    "test": "newman run plati-store.postman.json -r htmlextra"
+    "test": "newman run plati-store.postman.json -r htmlextra --reporter-htmlextra-export newman/index.html"
   }
 }

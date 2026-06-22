@@ -2,7 +2,7 @@ name: newman-api-tests
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
           npm install -g newman
           npm install -g newman-reporter-htmlextra
       - name: Run newman tests
-        run: newman run plati-store.postman.json -r htmlextra --reporter-htmlextra-export newman/index.html
+        run: npm run test
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
